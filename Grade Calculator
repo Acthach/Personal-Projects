@@ -1,0 +1,470 @@
+#all def functions/ helper
+def print_main_menu(x):#function that prints the menu 
+    print(26*"*")#prints the *
+    print("What would you like to do?")#p
+    for i in x:
+        print("{}: {}" .format(i,x[i]))
+    print(26*"*")
+""" def print_main_menu(x) basically takes the_menu which is a dictionary and prints the key and corresponding variable."""
+
+
+
+def check_option(option, menu):  
+    if type(option) == int and option not in menu:
+        print('WARNING:', "'{}'".format(option), 'is an invalid option.\nPlease enter a valid option.')
+        return "invalid"
+    if type(option) != int and option not in menu:
+        print('WARNING:', "'{}'".format(option), 'is not an integer.\nPlease enter an integer.')
+        return "invalid"
+    else:
+        print("You selected option {} to > {}.".format(option, menu[option]))
+        return "valid"
+""" def check_option takes opt input and the the_menu dictionary and compares the user input to the key of the menu to the input
+recieved and prints the statements and returns invalid or valid depending on if the input passes the test"""
+
+
+
+def list_categories(db1, showID = False):
+    if len(db1) == 0:
+        print("There are no categories.")
+    elif len(db1) == 1:
+        if showID == False:
+            for x in db1:
+                print("There is only 1 category:")
+                print("{} : {}%\n".format(db1[x][0], db1[x][1]))
+        else:
+            print("There is only 1 category:")
+            for x in db1:
+                print("{} - {} : {}%\n".format(x, db1[x][0], db1[x][1]))  
+    else:
+        if showID == False:
+            print("There are {} categories:".format(len(db1)))
+            for x in db1:
+                print ("{} : {}%".format(db1[x][0], db1[x][1]))
+        else:
+            print("There are {} categories:".format(len(db1)))
+            for x in db1:
+                print ("{} - {} : {}%".format(x, db1[x][0], db1[x][1]))
+"""def list_categories takes 2 parameters main_db and showID what it does is it looks through main_db and see how many categories are inside if there are
+0  categories then it will print out that there are no categories but if there is one category it will print out there is only one category and the name of that category and its percentage
+which are in the place of (db1[x][0], db1[x][1]) then if there are multiple categories in the main_db it goes through the for loop so for every category it prints the position of that category and
+the percentage until there is no more. additionaly if showId is true like whne called in some other helper functions than it will print the id of main_db key"""
+
+
+
+def create_id(db,offset):
+    return len(db)+offset
+"""well this creates the id starting from offset and increasing 100, 101, 102 and etc."""
+
+
+
+def is_numeric(val):
+    if val.isnumeric() == True:
+        return True        
+    else:
+        return False
+"""checks if the val is a number basically and returns true if it is and false if it isnt D;"""
+        
+
+
+def add_category(db, cid, info_str):#adds the actual datapoints
+    tempList = info_str.split(" ")
+    tempVar1 = tempList[0]
+    tempVar2 = float(tempList[1])
+    if len(db) > 10:
+        return False
+    else:
+        db[cid] = [tempVar1,tempVar2, []]
+"""so basically add category is the thing that actually adds the category into the database its basically called however many times add_categories wants it to be called and for the
+cid the function recieves it basically adds the info we get into the main_db dictionary"""
+
+def add_categories(db, max_num, id_offset):#prompts user 2 see how many 2 add
+    print(f"You can add up to {max_num-len(db)} categories.")
+    print("::: How many categories will you add?")
+    num_of_cats = input("> ")
+    if is_numeric(num_of_cats):
+        intcats = int(num_of_cats)
+        if intcats <= 10-len(db):
+            x = len(db)
+            for n in range(intcats):
+                print("::: Enter the category {} name (nospaces) followed by its percentage".format(n+1))
+                tempInput = input("> ")     
+                add_category(db, create_id(db, id_offset), tempInput)
+        else:
+            print("will exceed maximum categories")
+    else:
+        print("{} is not a valid integer".format(num_of_cats))
+""" the add_categories functions takes parameters max_num, id_offset so first we tell the user how many categories can be added and if its within the max categories-lendb it will
+call the addcategory function however many times the user inputed they want to add categories"""
+
+
+
+
+def update_category(db):#update currect categories
+    list_categories(db, showID = True)
+    tempBool = True    
+    print("::: Enter the category ID that you want to update")
+    which_cat = input("> ")
+    intCat = int(which_cat)
+    while tempBool:
+        list_keys = list(db.keys())
+        intCat = int(which_cat)
+        if intCat not in list_keys:
+            print("WARNING: `{}` is not an ID of an existing category.".format(which_cat))
+            print("::: Enter the ID of the category you want to update")
+            print("::: or enter M to return back to the menu.")
+            which_cat = input("> ")
+            if which_cat == "M" or which_cat == "m":
+                return                
+        elif intCat in list_keys:
+            print("::: Found a category with ID '{}':".format(intCat))
+            print("::: Enter the updated info:")
+            print("category name followed by the percentage.")
+            if_B = input("> ")
+            if ' ' in if_B:
+                tempList = if_B.split(" ")
+                tempVar1 = tempList[0]
+                tempVar2 = tempList[1]
+                db[intCat][0] = tempVar1
+                db[intCat][1] = float(tempVar2)
+                print("list updated")
+                tempBool = False
+            else:
+                print("WARNING: insufficient information for the update.") 
+                print("Record with ID {} was not updated!".format(intCat))
+"""so first we print out the current categories which prob couldve been easier actually ill jsut change it so first we call the list categories function to show the user the list and all the
+possible changes then we ask the user for an input of which one of the choices they wanna make and if the choice is good and in the list it will basically split the input we got and replace the
+variable thats in those spots. another thing i did was i used while statementwhile tembool because I didnt want to learn how to use recursive functions and thats prob what you guys wanted here but its ok.
+so basically it will keep looping until you actually go through with the fuction and it returns tembool as false which will stop the repearting of the function."""
+
+
+
+def delete_category(db):
+    print("Below is the info for the current categories.")
+    list_categories(db, showID = True)
+    tempBool = True            
+    print("::: Enter the category ID that you want to delete")
+    delete_which = input("> ")
+    intDel = int(delete_which)
+    while tempBool:
+        intDel = int(delete_which)
+        list_keys = list(db.keys())
+        if intDel not in list_keys:
+            print("WARNING: `{}` is not an ID of an existing category.".format(intDel))
+            print("::: Enter the ID of the category you want to delete")
+            print("::: or enter M to return back to the menu.")
+            delete_which = input("> ")
+            if delete_which == "M" or delete_which == "m":
+                return
+        elif intDel in list_keys:
+            print("::: Found a category with ID '{}':".format(intDel))
+            print(db[intDel][0],db[intDel][1])
+            print("::: Are you sure? Type Y or N")
+            Y_or_N = input("> ")
+            if Y_or_N == "Y" or Y_or_N == "y" :
+                del(db[intDel])
+                print("Deleted")
+                tempBool = False
+            else:
+                print("Looks like you aren't 100% sure.")
+                print("Cancelling the deletion.")
+                return
+"""aight so this one is pretty chill as always we start by showing the categories that the user wants to delete or not then we take an input for the category id that we want to delete
+which then goes into the while loop until we delete somethingo or we return to menu then we have the entire checking if the input is valid type stuff so we do that and the end is pretty simple
+basically after they input which id they want to delete it prints that category and ask if they are sure which then takes an input if Y or y it will delete that entire category and if anything
+else but yes is inputed they want not delete it and return to the menu"""
+
+
+def add_grades(db):
+    list_categories(main_db, showID = True)
+    print(":::Please enter category ID")
+    which_cat = input("> ")
+    if which_cat == "M" or which_cat == "m":
+        return
+    else:
+        tempBool=True
+    int_cat = int(which_cat)
+    list_keys = list(db.keys())
+    
+    while tempBool: 
+        if int_cat not in list_keys:
+            print("WARNING: `{}` is not an ID of an existing category.".format(which_cat))
+            print("::: Enter the ID of the category you want to add grades to")
+            print("::: or enter M to return back to the menu.")
+            which_cat = input("> ")
+            if which_cat == "M" or which_cat == "m":
+                return
+            else:
+                int_cat = int(which_cat)
+        else: 
+            print("You selected a {} category.".format(db[int_cat][0]))
+            print("::: Enter space-separated grades")
+            print("::: or enter M to return back to the menu")
+            which_grade = input("> ")
+            add_category_grades(db, int_cat, which_grade)
+            tempBool = False
+""" well add grades is the thing that basically sees what category you want to add the grades too. first it shows how many categories there are then checks if the input we get is m for menu or an
+id thats actually inside the keys of our db and then it starts the while loop because once again im too dumb to write a recursive function so until menu is clicked for the right category is selected
+it will ask to click menu or a right category is selected and when the right category is inputed it basically ask the user to input a string of numbers that then calls add_category_grades
+and actually adds them"""
+
+
+
+def add_category_grades(db,which_cat,which_grade):
+    tempList = which_grade.split(" ")
+    list1 = list(which_grade)
+    if which_grade.isalpha()==True:
+        print("Not a valid grade")
+        print("Did not add grade")
+    elif ' ' not in which_grade:
+        db[which_cat][2].append(float(which_grade))
+        print("{} grades {}".format(db[int(which_cat)][0],db[int(which_cat)][2]))
+        print("Success! Grades for the {} category were added.".format(db[int(which_cat)][0]))
+    else:
+        if ' ' in which_grade:
+            tempList = which_grade.split(" ")
+            for n in tempList:
+                float(n)
+            for x in range(len(tempList)):
+                db[which_cat][2].append(float(tempList[x]))
+            print("{} grades {}".format(db[int(which_cat)][0],db[int(which_cat)][2]))
+            print("Success! Grades for the {} category were added.".format(db[int(which_cat)][0]))
+"""so first we take the str of numbers and basically look first if there are any alphabet in it because thats not a grade and it will break so if there is an alphabet letter in it it will be invalid
+then it sees if there are no spaces in whichgrade after usually if its only one number it wont have a ' ' at the end which so i just input it into the grades list as a float because we want floats
+for everything and finally if they give like a long list of str then it will take the space and split it which gives a list of strings basically then we look at the list of strings and
+for every string inside the list we basically make all those floats then for every x in the range of the templist we basically append the grades into the list in the dictionary """
+
+
+
+def show_grades(db):
+    list_categories(db, showID = True)
+    if len(db) == 0:
+        return
+    print("::: Enter the category ID for which you want to see the grades")
+    print("::: or enter A to list all of them.")
+    which_cat = input("> ")
+    if which_cat == "A" or which_cat == "a":#listall
+        for x in db:
+            show_grades_category(db,x)
+        tempBool=False
+    else:
+        tempBool=True
+    list_keys = list(db.keys())
+    while tempBool:
+        int_cat = int(which_cat)
+        if int_cat not in list_keys:
+            print("WARNING: `{}` is not an ID of an existing category.".format(which_cat))
+            print("::: Enter a valid category ID to see the grades ")
+            print("::: or enter M to return back to the menu.")
+            which_cat = input("> ")
+            if which_cat == "M" or which_cat == "m":
+                return
+            elif which_cat == "A" or which_cat == "a":#listall
+                for x in db:
+                    show_grades_category(db,x)
+                    tempBool=False
+        else: 
+            print(":::You selected {} category.".format(db[int_cat][0]))
+            show_grades_category(db,which_cat)
+            tempBool = False
+"""show grades ok so first like always we look at list categories and then if there arent any it will go back 2 the menu then
+if there are it will ask for the id to change or A if the userinputs A then it will start a for loop for every key in the list it will
+call the show_grades_category that many times and if it does a single cid than it will first check if the CID is allowed and is inside
+the list which goes through the whileloop thing again until it gets A or a valid ID if they get a valid ID then it stops the while loop
+and calls the show_grades_category for that specific cid"""
+
+
+
+def show_grades_category(db,cid):
+    intcid = int(cid)
+    if len(db[intcid][2])!= 0:
+        print("{} grades {}".format(db[intcid][0], db[intcid][2]))
+    else:
+        print("::: No grades were provided for category ID {}.".format(db[intcid][0]))
+"""basically here everytime it is called it will print the db[intcid][0], db[intcid][2] which is just the category name
+and the list of grades that were given but if it dosent have grades inside it will just say no grades were provided for that category
+id"""
+
+
+
+def save_data(db):
+    list_categories(db, showID = True)
+    if len(db) == 0:
+        print("Skipping the creation of an empty file.")
+    else:
+        print("::: Save to the default file (grade_data.csv)? Type Y or N")
+        Y_or_N = input("> ")
+        if Y_or_N == "Y" or Y_or_N == "y":
+            print("Saveing the database in grade_data.csv")
+            print("Database contents:")
+            print(db)
+            save_dict_to_csv(db)
+        else:
+            print("Database contents not saved")
+"""basically ask the user if they watn to save the database that we have if there isnt anythign in the database it will skip and
+return to the menu but if there is stuff in the db then it will show us whats in the db and call the savedicttocsv function for our data"""
+
+
+
+def save_dict_to_csv(db):
+    import csv
+
+    rows = [[]]
+    for i in db:
+        key = i
+        name = db[i][0]
+        percent = db[i][1]
+        gradelist = db[i][2]
+
+        data = [key, name, percent]
+        for grade in gradelist:
+            data.append(grade)
+
+        rows.append(data)
+    with open("grade_data.csv",'w', newline='') as csvFile:
+        csvWriter = csv.writer(csvFile)
+        csvWriter.writerows(rows)
+
+"""This is the function that actually saves the data in maindb to the file. basically it looks through the dict and then
+puts them into a table basically and then opens the file grade_data and saves it onto that as a csv."""
+
+
+
+def load_dict_from_csv(filename):
+    import csv
+    with open(filename) as csvfile:
+        dict_reader = csv.reader(csvfile)
+        print(dict_reader)
+        grades_dict = {}
+        grades_list = []
+        for row in dict_reader:
+            if row != []:
+                key = int(row[0])
+                category = row[1]
+                percent = float(row[2])
+                for num in row[3:]:
+                    float_num = float(num)
+                    grades_list.append(float_num)
+                grades_dict[key] = [category, percent, grades_list]
+                grades_list = []
+    return grades_dict
+"""basically this is the formatting the data back from the csv file. it takes each value and formats it back
+into each row for example it looks through the first row which is suppose to be all keys and makes it back to
+the integer and sets it as key then does the same for basically the rest of the values and finally formats it
+which the grades_dict[key] after it appends the grades into the grade list """
+
+
+
+def load_data(db):
+    """
+    TODO: document the functinality
+    """
+    import csv
+    import os
+    filename = "grade_data.csv"
+    print(f"::: Load the default file ({filename})? Type Y or N")
+    Y_or_N = input("> ")
+    if Y_or_N == "Y" or Y_or_N == "y":
+        print(f"Reading the database from {filename}")
+        new_db = load_dict_from_csv(filename)
+        print("Resulting database:\n", new_db)
+        db.update(new_db)
+    ### TODO: Make sure to call db.update() with the new_db
+    ### to propagate the update back to the main program
+    elif Y_or_N == "N" or Y_or_N == "n":
+        print("::: Enter the name of the csv file to load.")
+        filename = input("> ")
+        if (".csv") in filename:
+            print("Reading the database from {}".format(filename))
+            new_db = load_dict_from_csv(filename)
+            db.update(new_db)
+        else:
+            print("WARNING: {} does not end with `.csv`".format(filename))
+            print("::: Enter the name of an existing csv file.")
+            filename = input("> ")
+"""basically this is the hting that ask the user if they want to go through the original file or if they want to
+choose their own files.and then it updates the exsisting database."""
+                  
+            
+        
+
+    
+
+
+
+
+
+if __name__ == "__main__":
+#dictionary area  
+    the_menu = {
+        1 : "List categories",
+        2 : "Add a category",
+        3 : "Update a category",
+        4 : "Delete a category",
+        5 : "Add grades",
+        6 : "Show grades",
+        7 : "Grade statistics",
+        8 : "Save the data",
+        9 : "Upload data from file",
+        'Q': "Quit this program"
+        }# TODO 1: add the options from the instructions
+    
+    
+    main_db = {}
+
+    max_cat = 10 # the max total num of categories a user can provide
+   
+    cat_id_offset = 100 # the starting value for the category ID
+
+    opt = None
+    
+
+
+# Main function
+    while True:
+        print_main_menu(the_menu) # TODO: uncomment and call with the menu as an argument
+        print("::: Enter an option")
+        opt = input("> ")
+        opt.upper # makes it so if they input it will automatically make it uppercase... 
+
+        if opt == "Q" or opt == "q" : # TODO 2: make Q or q quit the program 
+            print("Goodbye")
+            break
+
+        else:
+            if(opt.isdigit()):
+                opt = int(opt)
+
+            if check_option(opt, the_menu) == "invalid": 
+                continue
+
+        if opt == 1:
+            list_categories(main_db)
+
+        elif opt == 2:
+            add_categories(main_db,max_cat,cat_id_offset)
+
+        elif opt == 3:
+            update_category(main_db)
+
+        elif opt == 4:
+            delete_category(main_db)
+
+        elif opt == 5:
+            add_grades(main_db)
+
+        elif opt == 6:
+            show_grades(main_db)
+
+        elif opt == 8:
+            save_data(main_db)
+
+        elif opt == 9:
+            load_data(main_db)        
+        
+        else:
+            print("This option is not yet implemented.") # TODO: implement it
+
+        opt = input("::: Press Enter to continue...")
+
+    print("See you next time!")
